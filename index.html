@@ -51,7 +51,7 @@
             margin: auto; 
             background: var(--card-bg); 
             border-radius: 16px; 
-            padding: 24px; 
+            padding: 16px; /* reduced */
             box-shadow: var(--shadow);
             position: relative;
             overflow: hidden;
@@ -63,19 +63,19 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px; /* slightly slimmer */
             background: linear-gradient(90deg, var(--primary-color), #6366f1);
             border-radius: 16px 16px 0 0;
         }
 
         h1 { 
             margin-top: 0; 
-            font-size: 24px; 
+            font-size: 20px; /* slightly smaller */
             text-align: center; 
             color: var(--primary-color);
             font-weight: 700;
             position: relative;
-            padding-bottom: 12px;
+            padding-bottom: 8px; /* reduced */
         }
 
         h1::after {
@@ -84,8 +84,8 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
+            width: 50px;
+            height: 2px;
             background: var(--primary-color);
             border-radius: 2px;
         }
@@ -93,13 +93,13 @@
         .row { 
             display: flex; 
             flex-wrap: wrap; 
-            gap: 16px; 
-            margin-bottom: 20px;
+            gap: 10px; /* reduced */
+            margin-bottom: 12px; /* reduced */
         }
 
         .field { 
-            flex: 1 1 220px; 
-            min-width: 220px;
+            flex: 1 1 200px; 
+            min-width: 180px; /* allow narrower fields to save vertical space */
             position: relative;
         }
 
@@ -113,10 +113,10 @@
 
         input, button, select { 
             width: 100%; 
-            padding: 14px 14px; 
+            padding: 10px 12px; /* reduced */
             border: 1px solid var(--border-color); 
             border-radius: var(--border-radius); 
-            font-size: 16px; 
+            font-size: 15px; 
             box-sizing: border-box;
             transition: var(--transition);
         }
@@ -133,7 +133,7 @@
             color: white; 
             cursor: pointer; 
             border: none; 
-            min-height: 48px; 
+            min-height: 42px; /* slightly smaller */
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -155,22 +155,22 @@
         }
 
         .note { 
-            font-size: 14px; 
+            font-size: 13px; 
             color: var(--text-secondary); 
-            margin-top: 10px;
-            padding: 8px 12px;
+            margin-top: 8px;
+            padding: 6px 10px;
             background: rgba(244,247,251,0.8);
             border-radius: 8px;
             border-left: 3px solid var(--primary-color);
         }
 
         .status { 
-            margin-top: 16px; 
-            padding: 16px 18px; 
+            margin-top: 12px; 
+            padding: 12px 14px; 
             border-radius: var(--border-radius); 
             background: var(--primary-light); 
             color: #1e3a8a; 
-            font-size: 15px; 
+            font-size: 14px; 
             position: relative;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border: 1px solid rgba(29,78,216,0.1);
@@ -183,30 +183,30 @@
         }
 
         .summary { 
-            margin-top: 16px; 
-            padding: 16px; 
+            margin-top: 12px; 
+            padding: 12px; 
             border: 1px solid var(--border-color); 
             border-radius: var(--border-radius); 
             background: #f8fafc; 
-            font-size: 14px;
+            font-size: 13px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .summary dt { 
             font-weight: 700; 
-            margin-top: 10px;
+            margin-top: 6px; /* smaller */
             color: var(--primary-color);
         }
 
         .summary dd { 
-            margin: 0 0 10px 0; 
+            margin: 0 0 6px 0; 
             padding-left: 8px;
         }
 
         .generate-row { 
-            margin-bottom: 12px; 
+            margin-bottom: 8px; /* slightly reduced */
             justify-content: center; 
-            gap: 12px;
+            gap: 10px;
         }
 
         /* Ensure buttons inside the generate row don't stretch full width (overrides global button 100% rule) */
@@ -356,9 +356,15 @@
             background: var(--card-bg);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            padding: 16px;
-            margin-bottom: 16px;
+            padding: 12px; /* slightly reduced */
+            margin-bottom: 12px;
             border: 1px solid var(--border-color);
+        }
+
+        /* Make the header card (upper area) more compact */
+        .container > header.card {
+            padding: 8px 10px;
+            margin-bottom: 8px !important;
         }
 
         .grid {
@@ -386,7 +392,7 @@
 
         /* Enhanced form elements */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 8px; /* reduced spacing for compact layout */
         }
 
         /* Enhanced buttons */
@@ -478,11 +484,8 @@
 </head>
 <body>
     <div class="container fade-in">
-        <header class="card" style="margin-bottom: 24px; text-align: center;">
+        <header class="card" style="margin-bottom: 8px; text-align: center;">
             <h1>بيان بوسائل تنظيم الأسرة المقدمة</h1>
-            <div class="tooltip">
-                <span class="tooltiptext">حدد النطاق الزمني للحصول على تقرير مفصل عن وسائل تنظيم الأسرة</span>
-            </div>
         </header>
 
         <div class="card">
@@ -908,7 +911,7 @@
 
             // Create summary cards
             const summaryCards = [
-                { title: 'Filtered rows', value: rows.length, icon: '📊' },
+                { title: 'Filtered rows (Cases)', value: rows.length, icon: '📊' },
                 { title: 'From', value: fromIso || 'Any', icon: '📅' },
                 { title: 'To', value: toIso || 'Any', icon: '📅' },
                 { title: 'X1: Vaginal delivery', value: metrics.X1, icon: '👶' },
