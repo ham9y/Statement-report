@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1d4ed8">
+    <title>Statement Report Export</title>
+    <style>
+        :root { 
+            -webkit-font-smoothing:antialiased; 
+            -moz-osx-font-smoothing:grayscale; 
+            --primary-color: #1d4ed8;
+            --primary-dark: #1e40af;
+            --primary-light: #eef2ff;
+            --error-color: #dc2626;
+            --error-bg: #fee2e2;
+            --success-color: #16a34a;
+            --text-primary: #1c2533;
+            --text-secondary: #475569;
+            --bg-color: #f4f7fb;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+            --shadow: 0 12px 36px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+
+        html,body { 
+            height:100%; 
+            -webkit-text-size-adjust:100%; 
+            -ms-text-size-adjust:100%; 
+            background-color: var(--bg-color);
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            color: var(--text-primary); 
+            margin: 0; 
+            padding: 18px; 
+            -webkit-tap-highlight-color: transparent;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(29, 78, 216, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(29, 78, 216, 0.05) 0%, transparent 20%);
+        }
+
+        .container { 
+            box-sizing: border-box; 
+            width: 100%; 
+            max-width: 900px; 
+            margin: auto; 
+            background: var(--card-bg); 
+            border-radius: 16px; 
+            padding: 24px; 
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), #6366f1);
+            border-radius: 16px 16px 0 0;
+        }
+
+        h1 { 
+            margin-top: 0; 
+            font-size: 24px; 
+            text-align: center; 
+            color: var(--primary-color);
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .row { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 16px; 
+            margin-bottom: 20px;
+        }
+
+        .field { 
+            flex: 1 1 220px; 
+            min-width: 220px;
+            position: relative;
+        }
+
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        input, button, select { 
+            width: 100%; 
+            padding: 14px 14px; 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--border-radius); 
+            font-size: 16px; 
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, button:focus { 
+            outline: 3px solid rgba(29,78,216,0.12); 
+            outline-offset: 0;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+        }
+
+        button { 
+            background: var(--primary-color); 
+            color: white; 
+            cursor: pointer; 
+            border: none; 
+            min-height: 48px; 
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(29,78,216,0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(29,78,216,0.15);
+        }
+
+        .note { 
+            font-size: 14px; 
+            color: var(--text-secondary); 
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(244,247,251,0.8);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .status { 
+            margin-top: 16px; 
+            padding: 16px 18px; 
+            border-radius: var(--border-radius); 
+            background: var(--primary-light); 
+            color: #1e3a8a; 
+            font-size: 15px; 
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid rgba(29,78,216,0.1);
+        }
+
+        .errors { 
+            background: var(--error-bg); 
+            color: #991b1b;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .summary { 
+            margin-top: 16px; 
+            padding: 16px; 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--border-radius); 
+            background: #f8fafc; 
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .summary dt { 
+            font-weight: 700; 
+            margin-top: 10px;
+            color: var(--primary-color);
+        }
+
+        .summary dd { 
+            margin: 0 0 10px 0; 
+            padding-left: 8px;
+        }
+
+        .generate-row { 
+            margin-bottom: 12px; 
+            justify-content: center; 
+            gap: 12px;
+        }
+
+        /* Ensure buttons inside the generate row don't stretch full width (overrides global button 100% rule) */
+        .generate-row button, .generate-row .btn-with-spinner { 
+            width: auto; 
+            min-width: 180px; 
+            max-width: 92%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (max-width: 640px) { 
+            .generate-row button, .generate-row .btn-with-spinner { 
+                min-width: 140px; 
+            } 
+        }
+
+        /* Button spinner */
+        /* Place spinner inline beside the text so it doesn't overlay centered labels. */
+        .btn-with-spinner { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; /* space between text and spinner */
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .btn-spinner { 
+            width: 18px; 
+            height: 18px; 
+            border: 2px solid rgba(255,255,255,0.6); 
+            border-top-color: rgba(255,255,255,1); 
+            border-radius: 50%; 
+            animation: spin .8s linear infinite; 
+            display: inline-block; 
+            position: static; 
+            /* Use logical margin so spacing respects RTL/LTR */
+            margin-inline-start: 8px;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Pulse animation for important elements */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 640px) {
+            .container { 
+                border-radius: 12px; 
+                padding: 16px; 
+                margin: 8px;
+                box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            }
+            .container::before {
+                height: 3px;
+            }
+            h1 { 
+                font-size: 20px;
+                padding-bottom: 8px;
+            }
+            h1::after {
+                width: 40px;
+                height: 2px;
+            }
+            .row { 
+                gap: 12px; 
+            }
+            .field { 
+                flex: 1 1 100%; 
+                min-width: auto; 
+            }
+            input, button, select { 
+                font-size: 18px; 
+                padding: 16px;
+            }
+            button {
+                border-radius: 14px;
+            }
+            .status { 
+                position: sticky; 
+                top: 0; 
+                z-index: 40;
+                padding: 14px 16px;
+            }
+            .generate-row { 
+                position: sticky; 
+                bottom: 0; 
+                background: linear-gradient(rgba(244,247,251,0), #fff); 
+                padding-top: 12px; 
+                padding-bottom: 16px; 
+                z-index: 30;
+                margin-bottom: 0;
+            }
+            .note {
+                font-size: 15px;
+            }
+        }
+
+        /* Animation for status messages */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Progress indicator */
+        .progress-bar {
+            height: 4px;
+            width: 100%;
+            background-color: rgba(29, 78, 216, 0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #6366f1);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Card and grid enhancements */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        /* Loading states */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        /* Enhanced form elements */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        /* Enhanced buttons */
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(29,78,216,0.15);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background: #15803d;
+        }
+
+        /* Enhanced status messages */
+        .status-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+                padding: 0;
+            }
+            .generate-row, .status {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <header class="card" style="margin-bottom: 24px; text-align: center;">
+            <h1>بيان بوسائل تنظيم الأسرة المقدمة</h1>
+            <div class="tooltip">
+                <span class="tooltiptext">حدد النطاق الزمني للحصول على تقرير مفصل عن وسائل تنظيم الأسرة</span>
+            </div>
+        </header>
+
+        <div class="card">
+
+            <form id="reportForm">
+                <div class="row">
+                    <div class="field">
+                        <label for="fromDate">From date</label>
+                        <div class="form-group">
+                            <input type="date" id="fromDate" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="toDate">To date</label>
+                        <div class="form-group">
+                            <input type="date" id="toDate" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="templateFile">Template file (optional)</label>
+                        <div class="form-group">
+                            <input type="file" id="templateFile" accept=".docx">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row generate-row">
+                    <button id="generateButton" class="btn-with-spinner btn-primary">
+                        Calculate All <span id="genSpinner" class="btn-spinner" style="display:none"></span>
+                    </button>
+                    <button id="downloadButton" class="btn-with-spinner btn-primary btn-success" style="display:none;">
+                        Download Word file <span id="dlSpinner" class="btn-spinner" style="display:none"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="status" class="status fade-in">
+            <span class="status-icon">ℹ️</span>
+            Use the date fields and click generate. If the template fetch fails, choose the local <code>statement.docx</code>.
+        </div>
+
+        <div id="reportSummary" class="summary card fade-in" style="display:none;">
+            <h3 style="margin-top: 0; color: var(--primary-color); font-size: 18px; margin-bottom: 16px;">تقرير الملخص</h3>
+            <div class="grid" id="summaryContent"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.1/dist/pizzip.min.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwO1bCmzT3116r4jpDuLCR0xuzfaNAY9exWP6BHHysldFDV7_kkimMNRHz4ZELe2nU/exec';
+        const FIELD_KEYS = [
+            'timestamp','patient_name','age','address','admission_date','ticket_id','shift_day','comorbidities','past_medical','prev_surgery','surgery_type','parity_type','exact_parity','living_children','living_males','last_delivery_time','last_abortion_time','prev_cs','cs_number','sbp','dbp','pulse','temperature','resp_rate','consciousness','o2_sat','urine_output','meow_score','lab_tests','positive_lab_data','imaging','positive_imaging_data','blood_transfusion','blood_group','transfused','case_type','preg_conditions','preg_condition_other','gestational_age','exact_gestational_age','admission_reason','labour_onset','pregnancy_type','fetal_presentation','delivery_date','delivery_mode','cs_indications','fetus_gender','fetal_complications','maternal_complications','delivery_report','robson','contraceptive','contraceptive_refusal_reason','abortion_type','abortion_intervention','abortion_intervention_details','abortion_treatment','abortion_contraceptive','vesicular_ga_lmp','vesicular_type','vesicular_intervention','vesicular_medications','vesicular_contraceptive','ectopic_type','ectopic_disturbed','ectopic_intervention','ectopic_intervention_brief','ectopic_contraceptive','gyn_diagnosis','gyn_intervention','gyn_op_date','gyn_complications','gyn_report','gyn_treatment','complicated_location','complicated_presentation','complicated_intervention_done','complicated_intervention_todo','complicated_treatment','complicated_medical_report','consultant','specialist','residents','scrub_nurse','treatment_type','entered_by'
+        ];
+
+        const statusEl = document.getElementById('status');
+        const summaryEl = document.getElementById('reportSummary');
+        const generateButton = document.getElementById('generateButton');
+        const templateFileInput = document.getElementById('templateFile');
+
+        // Embedded default template (base64). Used when no local file is provided.
+        // This is the user's `statement.docx` encoded as base64 and embedded
+        // so the page can generate a report without fetching the file separately.
+            const EMBEDDED_DOCX_BASE64 = `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`;
+
+        function base64ToArrayBuffer(base64) {
+            const cleaned = String(base64).replace(/\s+/g, '');
+            const binaryString = atob(cleaned);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+            return bytes.buffer;
+        }
+
+        // Convert Western digits to Arabic-Indic (٠١٢٣٤٥٦٧٨٩) and handle Arabic decimal
+        function toArabicIndic(input) {
+            const map = { '0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩' };
+            return String(input).split('').map(ch => {
+                if (ch === '.') return '٫'; // Arabic decimal separator
+                if (map[ch]) return map[ch];
+                return ch;
+            }).join('');
+        }
+
+        // Format ISO date (YYYY-MM-DD) into Arabic full form like "13 يونيو 2026"
+        function formatDateArabicFull(isoDate) {
+            if (!isoDate) return '';
+            // Allow existing ISO or try to normalize other strings
+            const normalized = normalizeCellValue(isoDate);
+            const parts = String(normalized).split('-');
+            if (parts.length >= 3) {
+                const year = parts[0];
+                const month = Number(parts[1], 10) - 1;
+                const day = parts[2];
+                const monthsArabic = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+                const mName = monthsArabic[(month >=0 && month < 12) ? month : 0];
+                // convert day and year digits to Arabic-Indic
+                return `${toArabicIndic(day)} ${mName} ${toArabicIndic(year)}`;
+            }
+            // fallback: try Date parsing
+            const d = new Date(isoDate);
+            if (Number.isNaN(d.getTime())) return isoDate;
+            const day = String(d.getDate()).padStart(2,'0');
+            const monthsArabic = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+            const mName = monthsArabic[d.getMonth()];
+            const year = d.getFullYear();
+            return `${toArabicIndic(day)} ${mName} ${toArabicIndic(String(year))}`;
+        }
+
+        function formatNumberArabic(n) {
+            if (n === null || n === undefined || n === '') return '';
+            // integers may be passed as numbers; preserve decimals for percentages elsewhere
+            return toArabicIndic(String(n));
+        }
+
+        function setStatus(message, isError = false) {
+            statusEl.innerHTML = `
+                <span class="status-icon" style="font-size: 20px;">${isError ? '❌' : 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+            statusEl.className = 'status fade-in' + (isError ? ' errors' : '');
+
+            // Add a subtle animation to status messages
+            statusEl.style.opacity = '0';
+            statusEl.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                statusEl.style.transition = 'all 0.3s ease';
+                statusEl.style.opacity = '1';
+                statusEl.style.transform = 'translateY(0)';
+            }, 10);
+
+            // If error, add shake animation
+            if (isError) {
+                statusEl.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    statusEl.style.animation = '';
+                }, 500);
+            }
+        }
+
+        function formatDate(value) {
+            if (!value) return '';
+            const d = new Date(value);
+            if (Number.isNaN(d.getTime())) return value;
+            return d.toISOString().slice(0, 10);
+        }
+
+        function normalizeCellValue(value) {
+            if (!value && value !== 0) return '';
+            const str = String(value).trim();
+            if (!str) return '';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+            if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(str)) {
+                const parts = str.split('/').map(p => p.padStart(2, '0'));
+                const [a, b, c] = parts;
+                if (c.length === 2) return `20${c}-${a}-${b}`;
+                return `${c}-${a}-${b}`;
+            }
+            const parsed = new Date(str);
+            if (!Number.isNaN(parsed.getTime())) return parsed.toISOString().slice(0,10);
+            return str;
+        }
+
+        // Match Filter.html's normalization for sheet date values
+        function normalizeSheetDateValue(val){
+            if(typeof val !== 'string') return val;
+            var d=new Date(val);
+            if(isNaN(d.getTime())) return val;
+            return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        }
+
+        function rowObjectFromData(dataArray) {
+            const row = {};
+            FIELD_KEYS.forEach((key, index) => {
+                row[key] = (dataArray && dataArray[index] !== undefined) ? String(dataArray[index]).trim() : '';
+            });
+            return row;
+        }
+
+        function norm(text) {
+            return String(text || '').trim().toLowerCase();
+        }
+
+        async function fetchJSON(url, retries = 3) {
+            let lastErr;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url + (url.includes('?') ? '&' : '?') + '_=' + Date.now(), { cache: 'no-store' });
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return await response.json();
+                } catch (err) {
+                    lastErr = err;
+                    await new Promise(r => setTimeout(r, 800));
+                }
+            }
+            throw lastErr;
+        }
+
+        async function loadSheetData() {
+            setStatus('Fetching sheet data...');
+            const json = await fetchJSON(SCRIPT_URL + '?action=read');
+            if (!json.data || !Array.isArray(json.data)) throw new Error('No data in sheet response');
+            const rows = [];
+            json.data.forEach(item => {
+                let d = item.data || [];
+                while (d.length < FIELD_KEYS.length) d.push('');
+                d = d.map((v, i) => {
+                    const key = FIELD_KEYS[i];
+                    if (key === 'admission_date') return normalizeSheetDateValue(v);
+                    return v;
+                });
+                rows.push(rowObjectFromData(d));
+            });
+            return rows;
+        }
+
+        function isInRange(admissionDate, fromIso, toIso) {
+            // Match Filter.html behavior: if the row has no valid admission date, do not disqualify it.
+            if (!admissionDate) return true;
+            const normalized = normalizeSheetDateValue(admissionDate);
+            if (!normalized) return true; // unable to parse date -> treat as passing the date filter
+            if (fromIso && normalized < fromIso) return false;
+            if (toIso && normalized > toIso) return false;
+            return true;
+        }
+
+        function countCondition(rows, predicate) {
+            return rows.reduce((count, row) => predicate(row) ? count + 1 : count, 0);
+        }
+
+        function calculateMetrics(rows) {
+            // Use the same normalization and multi-value handling as Filter.html
+            const matches = row => row && typeof row === 'object';
+            const getVal = (row, key) => String((row && row[key]) || '').trim();
+            const normVal = v => String(v || '').trim().toLowerCase();
+            const splitMulti = v => String(v || '').split(/\n+/).map(s => s.trim()).filter(Boolean).map(s => s.toLowerCase());
+
+            const isVaginal = row => normVal(getVal(row, 'delivery_mode')) === 'vaginal';
+            const isCS = row => {
+                const v = normVal(getVal(row, 'delivery_mode'));
+                return v === 'c/s' || v === 'cs' || v === 'c s';
+            };
+            const isAbortion = row => normVal(getVal(row, 'admission_reason')) === 'abortion';
+
+            // Check contraception values across both the general `contraceptive` field
+            // and the `abortion_contraceptive` field (some rows use the latter for abortion cases).
+            const hasContraceptionExact = (row, value, field = 'contraceptive') => {
+                const v = normVal(getVal(row, field));
+                return v === normVal(value);
+            };
+            // For safety, also check multi-line stored values (some fields may have newlines)
+            const hasContraceptionMulti = (row, value, field = 'contraceptive') => {
+                const items = splitMulti(getVal(row, field));
+                return items.includes(normVal(value));
+            };
+            // Generic check that looks in both `contraceptive` and `abortion_contraceptive` fields
+            const hasContraception = (row, value) => {
+                return hasContraceptionExact(row, value, 'contraceptive') || hasContraceptionMulti(row, value, 'contraceptive')
+                    || hasContraceptionExact(row, value, 'abortion_contraceptive') || hasContraceptionMulti(row, value, 'abortion_contraceptive');
+            };
+            // Specifically detect "none" across both fields (used for X6 counting)
+            const hasNoneContraception = row => {
+                const v1 = normVal(getVal(row, 'contraceptive'));
+                const v2 = normVal(getVal(row, 'abortion_contraceptive'));
+                if (v1 === 'none' || v2 === 'none') return true;
+                const items1 = splitMulti(getVal(row, 'contraceptive'));
+                const items2 = splitMulti(getVal(row, 'abortion_contraceptive'));
+                return items1.includes('none') || items2.includes('none');
+            };
+
+            const X1 = countCondition(rows, row => matches(row) && isVaginal(row));
+            const X2 = countCondition(rows, row => matches(row) && isCS(row));
+            const X3 = countCondition(rows, row => matches(row) && isAbortion(row));
+            const X4 = X1 + X2 + X3;
+
+            const X5 = countCondition(rows, row => matches(row) && isCS(row) && hasContraception(row, 'IUD'));
+            // X6: explicitly sum Delivery cases with contraception 'None' and Abortion cases with contraception 'None'
+            const deliveryNone = countCondition(rows, row => matches(row) && (isVaginal(row) || isCS(row)) && hasNoneContraception(row));
+            const abortionNone = countCondition(rows, row => matches(row) && isAbortion(row) && hasNoneContraception(row));
+            const X6 = deliveryNone + abortionNone;
+            const X7 = countCondition(rows, row => matches(row) && isVaginal(row) && hasContraception(row, 'Implanon'));
+            const X8 = countCondition(rows, row => matches(row) && isCS(row) && hasContraception(row, 'Implanon'));
+            const X9 = countCondition(rows, row => matches(row) && isAbortion(row) && hasContraception(row, 'Implanon'));
+            const X10 = countCondition(rows, row => matches(row) && isVaginal(row) && hasContraception(row, 'POPs'));
+            const X11 = countCondition(rows, row => matches(row) && isCS(row) && hasContraception(row, 'POPs'));
+            const X12 = countCondition(rows, row => matches(row) && isAbortion(row) && hasContraception(row, 'POPs'));
+
+            const X13 = X2 > 0 ? Math.round(((X5 + X8) / X2) * 100) : 0;
+            const X14 = (X1 + X2) > 0 ? Math.round(((X5 + X7 + X8 + X9 + X10 + X11 + X12) / (X1 + X2)) * 100) : 0;
+
+            return { X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14 };
+        }
+
+        async function loadTemplateBytes() {
+            const file = templateFileInput.files[0];
+            if (file) {
+                return await file.arrayBuffer();
+            }
+
+            // Preferred: try to fetch the binary `statement.docx` from the same folder.
+            // NOTE: modern browsers block `fetch` from file:// pages. Serve via http://localhost when testing.
+            try {
+                const resp = await fetch('statement.docx', { cache: 'no-store' });
+                if (resp.ok) {
+                    const ab = await resp.arrayBuffer();
+                    console.log('Loaded template: statement.docx (bytes)', ab.byteLength);
+                    return ab;
+                } else {
+                    console.warn('statement.docx fetch returned', resp.status);
+                }
+            } catch (e) {
+                console.warn('statement.docx fetch failed:', e && e.message ? e.message : e);
+            }
+
+            // If the binary wasn't available, try a base64 file next.
+            try {
+                const resp2 = await fetch('statement.docx.b64', { cache: 'no-store' });
+                if (resp2.ok) {
+                    const text = await resp2.text();
+                    const cleaned = text.replace(/\s+/g, '');
+                    if (cleaned.length > 100) {
+                        console.log('Loaded template: statement.docx.b64 (chars)', cleaned.length);
+                        return base64ToArrayBuffer(cleaned);
+                    }
+                }
+            } catch (e) {
+                console.warn('statement.docx.b64 fetch failed:', e && e.message ? e.message : e);
+            }
+
+            // Fallback: try embedded base64 constant (if present and large enough).
+            if (typeof EMBEDDED_DOCX_BASE64 === 'string' && EMBEDDED_DOCX_BASE64.length > 1000) {
+                console.log('Using embedded base64 template (chars)', EMBEDDED_DOCX_BASE64.length);
+                return base64ToArrayBuffer(EMBEDDED_DOCX_BASE64);
+            }
+
+            throw new Error('No template available. Place `statement.docx` (preferred) or `statement.docx.b64` in the same folder, or choose a local file. Also open the page via http(s) (e.g. a local server) so fetch() can access local files.');
+        }
+
+        function replacePlaceholders(xml, values) {
+            const replacements = [
+                ['X14', values.X14], ['X13', values.X13], ['X12', values.X12], ['X11', values.X11], ['X10', values.X10],
+                ['X9', values.X9], ['X8', values.X8], ['X7', values.X7], ['X6', values.X6], ['X5', values.X5],
+                ['X4', values.X4], ['X3', values.X3], ['X2', values.X2], ['X1', values.X1],
+                ['Date1', values.Date1], ['Date2', values.Date2]
+            ];
+            let result = xml;
+            replacements.forEach(([placeholder, replacement]) => {
+                result = result.split(placeholder).join(String(replacement));
+            });
+            return result;
+        }
+
+        async function buildDocx(values) {
+            const buffer = await loadTemplateBytes();
+            const zip = new PizZip(buffer);
+            const documentXml = zip.file('word/document.xml').asText();
+            const updatedXml = replacePlaceholders(documentXml, values);
+            zip.file('word/document.xml', updatedXml);
+            return zip.generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        }
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Android helper: wait for a native BlobDownloader bridge, then send the blob
+        function waitForBlobDownloader(timeoutMs = 2000, intervalMs = 100) {
+            return new Promise((resolve) => {
+                if (typeof window.BlobDownloader !== 'undefined') return resolve(true);
+                const started = Date.now();
+                const id = setInterval(() => {
+                    if (typeof window.BlobDownloader !== 'undefined') {
+                        clearInterval(id);
+                        resolve(true);
+                    } else if (Date.now() - started > timeoutMs) {
+                        clearInterval(id);
+                        resolve(false);
+                    }
+                }, intervalMs);
+            });
+        }
+
+        function downloadFileToAndroid(blob, filename) {
+            return new Promise(async (resolve) => {
+                try {
+                    const available = await waitForBlobDownloader(2000, 100);
+                    if (!available) {
+                        console.warn('BlobDownloader not available; fallback to browser.');
+                        return resolve(false);
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        try {
+                            window.BlobDownloader.downloadBlob(e.target.result, filename);
+                            console.log('Sent blob to BlobDownloader for', filename);
+                            resolve(true);
+                        } catch (err) {
+                            console.error('Error calling BlobDownloader.downloadBlob:', err);
+                            resolve(false);
+                        }
+                    };
+                    reader.onerror = function (err) {
+                        console.error('FileReader error converting blob to dataURL', err);
+                        resolve(false);
+                    };
+                    reader.readAsDataURL(blob);
+                } catch (ex) {
+                    console.error('downloadFileToAndroid exception', ex);
+                    resolve(false);
+                }
+            });
+        }
+
+        function displaySummary(metrics, rows, fromIso, toIso) {
+            const summaryContent = document.getElementById('summaryContent');
+
+            // Create summary cards
+            const summaryCards = [
+                { title: 'Filtered rows', value: rows.length, icon: '📊' },
+                { title: 'From', value: fromIso || 'Any', icon: '📅' },
+                { title: 'To', value: toIso || 'Any', icon: '📅' },
+                { title: 'X1: Vaginal delivery', value: metrics.X1, icon: '👶' },
+                { title: 'X2: C/S delivery', value: metrics.X2, icon: '🔪' },
+                { title: 'X3: Abortion', value: metrics.X3, icon: '🚫' },
+                { title: 'X4: Total (X1+X2+X3)', value: metrics.X4, icon: '📈' },
+                { title: 'X5: C/S with IUD', value: metrics.X5, icon: '🔗' },
+                { title: 'X6: Cases without contraception', value: metrics.X6, icon: '❌' },
+                { title: 'X7: Vaginal with Implanon', value: metrics.X7, icon: '💉' },
+                { title: 'X8: C/S with Implanon', value: metrics.X8, icon: '💉' },
+                { title: 'X9: Abortion with Implanon', value: metrics.X9, icon: '💉' },
+                { title: 'X10: Vaginal with POPs', value: metrics.X10, icon: '💊' },
+                { title: 'X11: C/S with POPs', value: metrics.X11, icon: '💊' },
+                { title: 'X12: Abortion with POPs', value: metrics.X12, icon: '💊' },
+                { title: 'X13: % (X5+X8)/X2', value: metrics.X13 + '%', icon: '📊' },
+                { title: 'X14: % (All methods)/(All deliveries)', value: metrics.X14 + '%', icon: '📊' }
+                // X14: % (X5+X7+X8+X9+X10+X11+X12)/(X1+X2)
+            ];
+
+            // Build the HTML for summary cards
+            summaryContent.innerHTML = summaryCards.map(card => `
+                <div class="card" style="text-align: right;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">${card.icon}</div>
+                    <h4 style="margin: 0 0 8px 0; font-size: 16px; color: var(--text-secondary);">${card.title}</h4>
+                    <div style="font-size: 24px; font-weight: bold; color: var(--primary-color);">${card.value}</div>
+                </div>
+            `).join('');
+
+            summaryEl.style.display = 'block';
+
+            // Add animation to summary cards
+            const cards = summaryContent.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        }
+
+        // State holders for last calculation and doc values
+        let _lastMetrics = null;
+        let _lastDocValues = null;
+        let _lastFrom = null;
+        let _lastTo = null;
+
+        const downloadButtonEl = document.getElementById('downloadButton');
+        const genSpinner = document.getElementById('genSpinner');
+        const dlSpinner = document.getElementById('dlSpinner');
+
+        function setButtonLoading(buttonEl, spinnerEl, isLoading, loadingText, normalText) {
+            if (isLoading) {
+                buttonEl.disabled = true;
+                buttonEl.classList.add('loading');
+
+                // Store original text if not provided
+                if (!normalText) {
+                    normalText = buttonEl.getAttribute('data-original-text') || buttonEl.textContent.trim();
+                    buttonEl.setAttribute('data-original-text', normalText);
+                }
+
+                // Update button text with loading state
+                if (loadingText) {
+                    buttonEl.innerHTML = `<span style="position: relative; z-index: 1;">${loadingText} <span id="genSpinner" class="btn-spinner" style="display:inline-block;"></span></span>`;
+                } else {
+                    buttonEl.innerHTML = `<span style="position: relative; z-index: 1;"><span id="genSpinner" class="btn-spinner" style="display:inline-block;"></span></span>`;
+                }
+
+                // Add progress bar for long operations
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.style.marginTop = '8px';
+                buttonEl.appendChild(progressBar);
+
+                // Simulate progress for demo purposes (remove in production)
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 10;
+                    progressBar.querySelector('.progress-fill') || (progressBar.innerHTML = '<div class="progress-fill"></div>');
+                    progressBar.querySelector('.progress-fill').style.width = progress + '%';
+
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                    }
+                }, 200);
+            } else {
+                buttonEl.disabled = false;
+                buttonEl.classList.remove('loading');
+
+                // Restore original text
+                if (normalText) {
+                    buttonEl.innerHTML = `<span style="position: relative; z-index: 1;">${normalText} <span id="genSpinner" class="btn-spinner" style="display:none;"></span></span>`;
+                }
+
+                // Remove progress bar if it exists
+                const progressBar = buttonEl.querySelector('.progress-bar');
+                if (progressBar) {
+                    progressBar.remove();
+                }
+            }
+        }
+
+        generateButton.addEventListener('click', async () => {
+            try {
+                const fromIso = formatDate(document.getElementById('fromDate').value);
+                const toIso = formatDate(document.getElementById('toDate').value);
+                if (!fromIso || !toIso) {
+                    setStatus('Please choose both from and to dates.', true);
+                    return;
+                }
+                if (fromIso > toIso) {
+                    setStatus('From date must be before or equal to To date.', true);
+                    return;
+                }
+
+                // Disable the generate button and show spinner + loading label
+                const prevText = generateButton.firstChild.nodeValue.trim();
+                setButtonLoading(generateButton, genSpinner, true, 'Generating...', prevText);
+                setStatus('Fetching data and calculating metrics...');
+
+                const allRows = await loadSheetData();
+                const filteredRows = allRows.filter(row => isInRange(row.admission_date, fromIso, toIso));
+                const metrics = calculateMetrics(filteredRows);
+                metrics.Date1 = fromIso;
+                metrics.Date2 = toIso;
+
+                // Prepare Arabic-localized values for the exported document (store but DO NOT build yet)
+                const docValues = {
+                    X1: formatNumberArabic(metrics.X1),
+                    X2: formatNumberArabic(metrics.X2),
+                    X3: formatNumberArabic(metrics.X3),
+                    X4: formatNumberArabic(metrics.X4),
+                    X5: formatNumberArabic(metrics.X5),
+                    X6: formatNumberArabic(metrics.X6),
+                    X7: formatNumberArabic(metrics.X7),
+                    X8: formatNumberArabic(metrics.X8),
+                    X9: formatNumberArabic(metrics.X9),
+                    X10: formatNumberArabic(metrics.X10),
+                    X11: formatNumberArabic(metrics.X11),
+                    X12: formatNumberArabic(metrics.X12),
+                    X13: toArabicIndic(String(metrics.X13)) + '٪',
+                    X14: toArabicIndic(String(metrics.X14)) + '٪',
+                    Date1: formatDateArabicFull(metrics.Date1),
+                    Date2: formatDateArabicFull(metrics.Date2)
+                };
+
+                // Save results to state for later download action
+                _lastMetrics = metrics;
+                _lastDocValues = docValues;
+                _lastFrom = fromIso;
+                _lastTo = toIso;
+
+                // Show the Download button and enable it (hide spinner)
+                downloadButtonEl.style.display = 'inline-block';
+                setButtonLoading(downloadButtonEl, dlSpinner, false, '', 'Download Word file');
+
+                setStatus('Calculations complete. Click "Download Word file" to build and download the document.');
+                displaySummary(metrics, filteredRows, fromIso, toIso);
+
+                // restore the generate button state (allow re-generate)
+                setButtonLoading(generateButton, genSpinner, false, '', prevText);
+            } catch (err) {
+                setStatus('Error: ' + (err && err.message ? err.message : String(err)), true);
+                setButtonLoading(generateButton, genSpinner, false, '', 'Generate statement.docx');
+            }
+        });
+
+        // Download button builds the docx and triggers download when clicked
+        downloadButtonEl.addEventListener('click', async () => {
+            try {
+                if (!_lastDocValues) { setStatus('Nothing to download. Click Generate first.', true); return; }
+                setButtonLoading(downloadButtonEl, dlSpinner, true, 'Preparing document...', 'Download Word file');
+                setStatus('Building document...');
+
+                const blob = await buildDocx(_lastDocValues);
+                const filename = `statement-report-${_lastFrom}_to_${_lastTo}.docx`;
+                const sent = await downloadFileToAndroid(blob, filename);
+                if (!sent) downloadBlob(blob, filename);
+
+                setStatus('Document ready. Download should start automatically.');
+                setButtonLoading(downloadButtonEl, dlSpinner, false, '', 'Download Word file');
+            } catch (err) {
+                setStatus('Error while building document: ' + (err && err.message ? err.message : String(err)), true);
+                setButtonLoading(downloadButtonEl, dlSpinner, false, '', 'Download Word file');
+            }
+        });
+    </script>
+</body>
+</html>
